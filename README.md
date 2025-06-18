@@ -24,12 +24,6 @@ Um aplicativo estilo Instagram desenvolvido com React Native, que permite visual
 - Hooks do React (useState, useEffect)
 - AntDesign Icons
 
----
 
-## Instalação
 
-1. Clone o repositório:
 
-```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
