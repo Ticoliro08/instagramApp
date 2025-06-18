@@ -1,29 +1,39 @@
+// Importando React
 import React from 'react';
+
+// Importando componentes do React Native
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 
+// Pegando a largura da tela para usar nos estilos
 const { width } = Dimensions.get('window');
 
+// Função principal do componente, chamada UsarStory
 export default function UsarStory({ navigation, route }) {
+  // Pegando os parâmetros recebidos da rota (neste caso, os dados do story clicado)
   const { usar } = route.params;
 
   return (
+    // Container principal da tela
     <View style={styles.container}>
-    <View style={styles.storyCard} > 
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Profile', { user: usar })}
-        
-      >
-        {/* Cabeçalho com perfil */}
-        <View style={styles.header}>
-          <Image source={usar.ftPerfil} style={styles.avatar} />
-          <Text style={styles.username}>{usar.usuario}</Text>
-        </View>
-              </TouchableOpacity>
+      
+      {/* Cartão onde vai ficar o conteúdo da story */}
+      <View style={styles.storyCard}>
 
+        {/* Tornando o cabeçalho clicável, ao clicar o usuário vai para a tela de Profile */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile', { user: usar })}
+        >
+          {/* Cabeçalho com imagem de perfil e nome do usuário */}
+          <View style={styles.header}>
+            <Image source={usar.ftPerfil} style={styles.avatar} />
+            <Text style={styles.username}>{usar.usuario}</Text>
+          </View>
+        </TouchableOpacity>
 
-        {/* Imagem da publicação */}
+        {/* Exibição da imagem principal da story */}
         <Image source={usar.imagem} style={styles.storyImage} />
-        </View>
+
+      </View>
     </View>
   );
 }

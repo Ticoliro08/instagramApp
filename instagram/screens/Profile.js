@@ -1,129 +1,109 @@
-import React, { useState } from 'react';
-import { ScrollView,View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+// Importando os hooks do React
+import React, { useState, useEffect } from 'react';
 
-export default function Profile({ route, navigation }) {
-  const { user } = route.params;
+// Importando os componentes do React Native
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 
-  // Estado de seguidores e seguindo
-  const [seguidores, setSeguidores] = useState(user.seguidores);
-  const [seguindo, setSeguindo] = useState(false);
+// Importando o AsyncStorage para armazenar e buscar dados locais
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-  const alternarSeguir = () => {
-    if (seguindo) {
-      setSeguidores(seguidores - 1);
-    } else {
-      setSeguidores(seguidores + 1);
-    }
-    setSeguindo(!seguindo);
-  };
+// Importando a imagem de perfil padrão (caso o usuário ainda não tenha definido uma)
+import PerfilPadrao from '../assets/perfil.png';
 
+// Importando as imagens usadas nas publicações
+import Disney from '../assets/publi/disneyy.jpg';
+import Praia from '../assets/publi/praia.png';
+import Neymar from '../assets/publi/neymar.jpg';
+import GuilhermePubli from '../assets/publi/guilhermePubli.jpg';
+import LucasPubli from '../assets/publi/lucasPubli.jpeg';
+import PietroPubli from '../assets/publi/pietroPubli.jpeg';
+import VitorPubli from '../assets/publi/vitorPubli.jpeg';
+import MatPubli from '../assets/publi/matPubli.jpeg';
+import MuriloPubli from '../assets/publi/muriloPubli.jpeg';
+
+// Início do componente Profile
+export default function Profile({ isDarkMode }) {
+  // Estado para armazenar os posts carregados
+  const [dados, setDados] = useState([]);
+
+  // useEffect: Carrega os posts ao abrir a tela
+  useEffect(() => {
+    // Função para buscar os posts salvos
+    const getPosts = async () => {
+      try {
+        const storedPosts = await AsyncStorage.getItem('posts');
+        if (storedPosts) {
+          setDados(JSON.parse(storedPosts)); // Se houver posts salvos, carrega
+        }
+      } catch (error) {
+        console.error('Erro ao recuperar os posts:', error);
+      }
+    };
+
+    getPosts();
+  }, []);
+
+  // Filtro: Pega só os posts do usuário atual
+  const meusPosts = dados.filter((post) => post.usuario === 'guih.sdl');
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: isDarkMode ? '#000' : '#fff', // Fundo preto se for dark mode
+    },
+    fotoPerfil: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      alignSelf: 'center',
+      marginBottom: 16,
+    },
+    nome: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: isDarkMode ? '#fff' : '#000', // Cor da fonte conforme o tema
+      textAlign: 'center',
+    },
+    bio: {
+      fontSize: 14,
+      color: isDarkMode ? '#aaa' : '#333',
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: isDarkMode ? '#fff' : '#000',
+      marginBottom: 8,
+    },
+    postImage: {
+      width: '100%',
+      height: 200,
+      marginBottom: 16,
+      borderRadius: 8,
+    },
+  });
+
+  // Renderização da tela
   return (
     <ScrollView style={styles.container}>
       {/* Foto de perfil */}
-      <Image source={user.ftPerfil} style={styles.fotoPerfil} />
+      <Image source={PerfilPadrao} style={styles.fotoPerfil} />
 
       {/* Nome do usuário */}
-      <Text style={styles.nome}>{user.usuario}</Text>
+      <Text style={styles.nome}>guih.sdl</Text>
 
-      {/* Bio */}
-      <Text style={styles.bio}>{user.bio}</Text>
+      {/* Bio do usuário */}
+      <Text style={styles.bio}>Vinhedo-sp @kay_.parpinelli</Text>
 
-      {/* Seguidores */}
-      <Text style={styles.seguidores}>{seguidores} seguidores</Text>
-<View style={styles.botoes}> 
-      {/* Botão Seguir/Seguindo */}
-      <TouchableOpacity
-        style={[styles.botaoSeguir, seguindo ? styles.botaoSeguindo : styles.botaoNaoSeguindo]}
-        onPress={alternarSeguir}
-      >
+      {/* Título da seção de publicações */}
+      <Text style={styles.sectionTitle}>Minhas publicações</Text>
 
-
-        <Text style={styles.textoBotao}>
-          {seguindo ? 'Seguindo' : 'Seguir'}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.navigate('mensagem', {
-  usuario: user.usuario,
-  ftPerfil: user.ftPerfil,
-})}
- style={styles.botaoMsg}>
-        <Text style={styles.textobotaoMsg}>mensagem</Text>
-      </TouchableOpacity>
-      </View>
-
-<View>
-
-
-
-
-
-</View>
-
-
-
-
-
-
+      {/* Exibição dos posts do usuário */}
+      {meusPosts.map((post) => (
+        <Image key={post.id} source={post.imagem} style={styles.postImage} />
+      ))}
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  botoes:{
-
-flexDirection:'row',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-  },
-  fotoPerfil: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
-  },
-  nome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  bio: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  seguidores: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 20,
-  },
-  botaoSeguir: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  botaoSeguindo: {
-    backgroundColor: '#34C759',
-  },
-  botaoNaoSeguindo: {
-    backgroundColor: '#007AFF',
-  },
-  textoBotao: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  botaoMsg: {
-    backgroundColor: '#ccc',
-   paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginBottom: 20,
-    marginLeft:20,
-  },
-  
-});

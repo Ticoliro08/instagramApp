@@ -1,4 +1,7 @@
+// Importando React e o hook useState
 import React, { useState } from 'react';
+
+// Importando componentes do React Native
 import {
   View,
   Text,
@@ -12,44 +15,64 @@ import {
   Platform,
 } from 'react-native';
 
+// Função principal do componente Cadastro (LoginScreen é o nome que você usou, mas na verdade representa o cadastro)
 export default function LoginScreen({ navigation }) {
+  // Criando estados para armazenar o nome, e-mail, senha, status de carregamento e a cor de fundo da tela
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [carregando, setCarregando] = useState(false);
   const [statusColor, setStatusColor] = useState('#f5f5f5');
 
+  // Função que será chamada ao clicar no botão "Cadastrar"
   const handleLogin = () => {
+    // Verifica se algum campo está vazio
     if (nome.trim() === '' || email.trim() === '' || senha === '') {
+      // Se estiver, altera a cor da tela e exibe alerta de erro
       setStatusColor('red');
       Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
 
+    // Se todos os campos estiverem preenchidos, inicia o carregamento
     setCarregando(true);
+    // Muda a cor de fundo para azul enquanto carrega
     setStatusColor('#0066cc');
 
+    // Simula um tempo de processamento (2 segundos)
     setTimeout(() => {
+      // Finaliza o carregamento
       setCarregando(false);
+      // Muda a cor de fundo para verde indicando sucesso
       setStatusColor('green');
+      // Exibe alerta de sucesso com o nome do usuário
       Alert.alert('Sucesso', `Bem-vindo, ${nome}!`);
+
+      // Limpa os campos
       setNome('');
       setEmail('');
       setSenha('');
+
+      // Navega de volta para o Feed
       navigation.navigate('Feed');
     }, 2000);
   };
 
   return (
+    // View que ajusta o teclado para não cobrir os campos de input
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: statusColor }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* Barra de status com a cor de fundo da tela */}
       <StatusBar backgroundColor={statusColor} barStyle="light-content" />
 
+      {/* Título da tela */}
       <Text style={styles.title}>Vamos começar</Text>
+      {/* Subtítulo */}
       <Text style={styles.text}>Crie sua conta no nosso app</Text>
 
+      {/* Campo de input para o nome */}
       <TextInput
         style={styles.input}
         placeholder="Nome Completo"
@@ -57,6 +80,8 @@ export default function LoginScreen({ navigation }) {
         value={nome}
         onChangeText={setNome}
       />
+
+      {/* Campo de input para o e-mail */}
       <TextInput
         style={styles.input}
         placeholder="E-mail"
@@ -66,6 +91,8 @@ export default function LoginScreen({ navigation }) {
         value={email}
         onChangeText={setEmail}
       />
+
+      {/* Campo de input para a senha */}
       <TextInput
         style={styles.input}
         placeholder="Senha"
@@ -75,14 +102,18 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setSenha}
       />
 
+      {/* Botão de cadastro */}
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={carregando}>
         {carregando ? (
+          // Enquanto estiver carregando, mostra o indicador de carregamento
           <ActivityIndicator color="#fff" />
         ) : (
+          // Caso contrário, mostra o texto do botão
           <Text style={styles.buttonText}>Cadastrar</Text>
         )}
       </TouchableOpacity>
 
+      {/* Texto com link para fazer login caso já tenha conta */}
       <View style={styles.textSign}>
         <Text>Já tem uma conta? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Sign in')}>

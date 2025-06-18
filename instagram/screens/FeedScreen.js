@@ -1,17 +1,24 @@
+// Importando os hooks useState e useEffect do React
 import React, { useState, useEffect } from 'react';
+
+// Importando os componentes visuais do React Native
 import {
   View,
   ScrollView,
   StyleSheet,
   Image,
   TouchableOpacity,
-  RefreshControl
+  RefreshControl, // Controle de "puxar para atualizar"
 } from 'react-native';
+
+// Importando o AsyncStorage para salvar e recuperar dados localmente
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Importando os componentes de post e story que serão exibidos no feed
 import Post from './Post';
 import Story from './story';
 
-//publicações
+// Importando as imagens das publicações
 import Disney from '../assets/publi/disneyy.jpg';
 import Praia from '../assets/publi/praia.png';
 import Neymar from '../assets/publi/neymar.jpg';
@@ -22,7 +29,7 @@ import VitorPubli from '../assets/publi/vitorPubli.jpeg';
 import MatPubli from '../assets/publi/matPubli.jpeg';
 import MuriloPubli from '../assets/publi/muriloPubli.jpeg';
 
-//Perfil
+// Importando as imagens de perfil dos usuários
 import Karen from '../assets/perfil/karen.png';
 import Parpinelli from '../assets/perfil/parpinelli.png';
 import Guilherme from '../assets/perfil/guilherme.png';
@@ -33,26 +40,31 @@ import VitorPerfil from '../assets/perfil/vitorPerfil.jpeg';
 import MatPerfil from '../assets/perfil/matPerfil.jpeg';
 import MuriloPerfil from '../assets/perfil/muriloPerfil.jpeg';
 
+// Componente principal do Feed
 export default function FeedScreen({ navigation, isDarkMode }) {
+  // Estado para armazenar os dados dos posts
   const [dados, setDados] = useState([]);
+
+  // Estado para controlar se está atualizando (puxar para atualizar)
   const [atualizando, setAtualizando] = useState(false);
 
+  // Função chamada ao puxar o feed para baixo (refresh)
   function aoAtualizar() {
     setAtualizando(true);
     setTimeout(() => {
       setAtualizando(false);
-      alert("Atualizado com sucesso!");
-    }, 1500); // Simulando carregamento
+      alert("Atualizado com sucesso!"); // Simulando atualização
+    }, 1500);
   }
-
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDarkMode ? '#000' : '#fff',
+      backgroundColor: isDarkMode ? '#000' : '#fff', // Preto no dark mode, branco no normal
     },
-   
   });
+
+  // Array com os posts e dados dos usuários
   const posts = [
     {
       id: '1',
@@ -146,57 +158,68 @@ export default function FeedScreen({ navigation, isDarkMode }) {
     },
   ];
 
+  // useEffect roda quando o componente é carregado
   useEffect(() => {
+    // Função para salvar os posts no AsyncStorage
     const storePosts = async () => {
       try {
-        await AsyncStorage.setItem('posts', JSON.stringify(posts));
+        await AsyncStorage.setItem('posts', JSON.stringify(posts)); // Salvando os posts
       } catch (error) {
         console.error('Erro ao armazenar os posts:', error);
       }
     };
 
+    // Função para pegar os posts do AsyncStorage
     const getPosts = async () => {
       try {
-        const storedPosts = await AsyncStorage.getItem('posts');
+        const storedPosts = await AsyncStorage.getItem('posts'); // Buscando
         if (storedPosts) {
-          setDados(JSON.parse(storedPosts));
+          setDados(JSON.parse(storedPosts)); // Se achou, usa os salvos
         } else {
-          setDados(posts);
+          setDados(posts); // Se não, usa os originais
         }
       } catch (error) {
         console.error('Erro ao recuperar os posts:', error);
       }
     };
 
+    // Chama as duas funções ao abrir o app
     storePosts();
     getPosts();
   }, []);
 
+  // Renderização da tela
   return (
-    <ScrollView style={styles.container}  refreshControl={
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        // Configuração do "puxar para atualizar"
         <RefreshControl
           refreshing={atualizando}
           onRefresh={aoAtualizar}
-          colors={["#0af"]} // Android
-          tintColor="#0af" // iOS
+          colors={["#0af"]} // Cor no Android
+          tintColor="#0af" // Cor no iOS
           title="Puxando pra atualizar..."
         />
-      }>
-    
+      }
+    >
+
+      {/* Lista de Stories no topo (scroll horizontal) */}
       <ScrollView horizontal>
         {dados.map((itemm) => (
           <View key={itemm.id}>
-         
-            <Story story={itemm} navigation={navigation}/>
+            <Story story={itemm} navigation={navigation} />
           </View>
         ))}
       </ScrollView>
 
+      {/* Lista de Posts abaixo */}
       {dados.map((item) => (
         <View key={item.id}>
           <Post post={item} navigation={navigation} />
         </View>
       ))}
+
     </ScrollView>
   );
 }

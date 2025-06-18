@@ -1,4 +1,6 @@
-import React from 'react';
+import React from 'react'; 
+// Importa o React para criar o componente funcional
+
 import {
   Text,
   Image,
@@ -6,27 +8,45 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
-import esfera from '../assets/icons/esfera.gif'
-export default function App({ navigation }) {
+} from 'react-native'; 
+// Importa componentes básicos do React Native para a interface
+
+import esfera from '../assets/icons/esfera.gif' 
+// Importa uma imagem animada (gif) chamada esfera, usada na tela
+
+export default function App({ navigation }) { 
+  // Componente funcional principal da tela Home, recebe a prop navigation para navegação
+
   return (
-    <ScrollView style={styles.body}>
-      <TouchableOpacity style={styles.sign} onPress={() => navigation.navigate('Sign in')}>
-        <Text style={styles.signInText}>Sign in</Text>
+    <ScrollView style={styles.body}> 
+    {/* ScrollView para permitir rolagem vertical da tela */}
+
+      <TouchableOpacity style={styles.sign} onPress={() => navigation.navigate('Sign in')}> 
+      {/* Botão "Sign in" que, ao ser clicado, navega para a tela de login ("Sign in") */}
+
+        <Text style={styles.signInText}>Sign in</Text> 
+        {/* Texto dentro do botão */}
       </TouchableOpacity>
 
       <Image
         source={esfera} 
-        style={{ width: '100%', height: 300 }}
+        style={{ width: '100%', height: 300 }} 
+        // Exibe a imagem importada esfera, com largura total e altura fixa
       />
 
-      <View style={styles.center}>
+      <View style={styles.center}> 
+      {/* Container centralizado para o texto e botão */}
+
         <Text style={styles.text}>
           Venha conhecer meu protótipo de Instagram usando React Native
-        </Text>
+        </Text> 
+        {/* Texto de apresentação do app */}
 
-        <TouchableOpacity onPress={() => navigation.navigate('cadastro')} style={styles.btn}>
-          <Text style={styles.btnText}>Cadastre-se</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('cadastro')} style={styles.btn}> 
+        {/* Botão "Cadastre-se" que navega para a tela de cadastro */}
+
+          <Text style={styles.btnText}>Cadastre-se</Text> 
+          {/* Texto dentro do botão */}
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -34,6 +54,8 @@ export default function App({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+
+
   body: {
     backgroundColor: '#e9e4e9',
   },
