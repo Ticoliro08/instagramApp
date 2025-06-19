@@ -1,109 +1,141 @@
-// Importando os hooks do React
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; 
+// Importa React e o hook useState para controlar estados locais do componente
 
-// Importando os componentes do React Native
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'; 
+// Importa componentes básicos do React Native para construir a interface
 
-// Importando o AsyncStorage para armazenar e buscar dados locais
-import AsyncStorage from '@react-native-async-storage/async-storage';
+export default function Profile({ route, navigation }) { 
+  // Componente funcional Profile recebe as props 'route' e 'navigation' para acessar parâmetros e navegação
 
-// Importando a imagem de perfil padrão (caso o usuário ainda não tenha definido uma)
-import PerfilPadrao from '../assets/perfil.png';
+  const { user } = route.params; 
+  // Extrai o objeto 'user' que foi passado na navegação para esta tela
 
-// Importando as imagens usadas nas publicações
-import Disney from '../assets/publi/disneyy.jpg';
-import Praia from '../assets/publi/praia.png';
-import Neymar from '../assets/publi/neymar.jpg';
-import GuilhermePubli from '../assets/publi/guilhermePubli.jpg';
-import LucasPubli from '../assets/publi/lucasPubli.jpeg';
-import PietroPubli from '../assets/publi/pietroPubli.jpeg';
-import VitorPubli from '../assets/publi/vitorPubli.jpeg';
-import MatPubli from '../assets/publi/matPubli.jpeg';
-import MuriloPubli from '../assets/publi/muriloPubli.jpeg';
+  // Estado para controlar a quantidade de seguidores atuais
+  const [seguidores, setSeguidores] = useState(user.seguidores);
 
-// Início do componente Profile
-export default function Profile({ isDarkMode }) {
-  // Estado para armazenar os posts carregados
-  const [dados, setDados] = useState([]);
+  // Estado para controlar se o usuário está seguindo este perfil ou não
+  const [seguindo, setSeguindo] = useState(false);
 
-  // useEffect: Carrega os posts ao abrir a tela
-  useEffect(() => {
-    // Função para buscar os posts salvos
-    const getPosts = async () => {
-      try {
-        const storedPosts = await AsyncStorage.getItem('posts');
-        if (storedPosts) {
-          setDados(JSON.parse(storedPosts)); // Se houver posts salvos, carrega
-        }
-      } catch (error) {
-        console.error('Erro ao recuperar os posts:', error);
-      }
-    };
+  // Função para alternar entre seguir e deixar de seguir o usuário
+  const alternarSeguir = () => {
+    if (seguindo) {
+      // Se já está seguindo, diminui o número de seguidores
+      setSeguidores(seguidores - 1);
+    } else {
+      // Se não está seguindo, aumenta o número de seguidores
+      setSeguidores(seguidores + 1);
+    }
+    // Atualiza o estado 'seguindo' para o inverso do atual (toggle)
+    setSeguindo(!seguindo);
+  };
 
-    getPosts();
-  }, []);
-
-  // Filtro: Pega só os posts do usuário atual
-  const meusPosts = dados.filter((post) => post.usuario === 'guih.sdl');
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 16,
-      backgroundColor: isDarkMode ? '#000' : '#fff', // Fundo preto se for dark mode
-    },
-    fotoPerfil: {
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      alignSelf: 'center',
-      marginBottom: 16,
-    },
-    nome: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: isDarkMode ? '#fff' : '#000', // Cor da fonte conforme o tema
-      textAlign: 'center',
-    },
-    bio: {
-      fontSize: 14,
-      color: isDarkMode ? '#aaa' : '#333',
-      textAlign: 'center',
-      marginBottom: 16,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: isDarkMode ? '#fff' : '#000',
-      marginBottom: 8,
-    },
-    postImage: {
-      width: '100%',
-      height: 200,
-      marginBottom: 16,
-      borderRadius: 8,
-    },
-  });
-
-  // Renderização da tela
   return (
     <ScrollView style={styles.container}>
-      {/* Foto de perfil */}
-      <Image source={PerfilPadrao} style={styles.fotoPerfil} />
+      {/* Container com rolagem para o conteúdo do perfil */}
 
-      {/* Nome do usuário */}
-      <Text style={styles.nome}>guih.sdl</Text>
+      <Image source={user.ftPerfil} style={styles.fotoPerfil} /> 
+      {/* Exibe a foto de perfil do usuário */}
 
-      {/* Bio do usuário */}
-      <Text style={styles.bio}>Vinhedo-sp @kay_.parpinelli</Text>
+      <Text style={styles.nome}>{user.usuario}</Text> 
+      {/* Exibe o nome de usuário */}
 
-      {/* Título da seção de publicações */}
-      <Text style={styles.sectionTitle}>Minhas publicações</Text>
+      <Text style={styles.bio}>{user.bio}</Text> 
+      {/* Exibe a biografia do usuário */}
 
-      {/* Exibição dos posts do usuário */}
-      {meusPosts.map((post) => (
-        <Image key={post.id} source={post.imagem} style={styles.postImage} />
-      ))}
+      <Text style={styles.seguidores}>{seguidores} seguidores</Text> 
+      {/* Exibe o número atual de seguidores */}
+
+      <View style={styles.botoes}> 
+      {/* Container para os botões de seguir e enviar mensagem, alinhados na mesma linha */}
+
+        <TouchableOpacity
+          style={[styles.botaoSeguir, seguindo ? styles.botaoSeguindo : styles.botaoNaoSeguindo]} 
+          onPress={alternarSeguir} 
+          // Botão que chama a função para alternar o status de seguir ou não
+        >
+          <Text style={styles.textoBotao}>
+            {seguindo ? 'Seguindo' : 'Seguir'} 
+            {/* Texto do botão muda conforme estado */}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('mensagem', {
+            usuario: user.usuario,
+            ftPerfil: user.ftPerfil,
+          })}
+          style={styles.botaoMsg}
+          // Botão que navega para a tela de mensagem passando usuário e foto de perfil
+        >
+          <Text style={styles.textobotaoMsg}>mensagem</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View>
+      {/* Espaço reservado (sem conteúdo definido) */}
+      </View>
+
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+ 
+
+  botoes:{
+
+flexDirection:'row',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+  },
+  fotoPerfil: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 20,
+  },
+  nome: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  bio: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  seguidores: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+  },
+  botaoSeguir: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  botaoSeguindo: {
+    backgroundColor: '#34C759',
+  },
+  botaoNaoSeguindo: {
+    backgroundColor: '#007AFF',
+  },
+  textoBotao: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  botaoMsg: {
+    backgroundColor: '#ccc',
+   paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+    marginLeft:20,
+  },
+  
+});
